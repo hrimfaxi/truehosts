@@ -1,15 +1,6 @@
 #!/usr/bin/env python
 
-import subprocess
-
-def getIP(hostname):
-    p = subprocess.Popen("gethostip -d %s" % (hostname), stdout=subprocess.PIPE, stderr=open("/dev/null", "r"), shell=1)  
-    res = p.stdout.readlines()
-
-    if len(res):
-        return res[0].strip()
-    else:
-        raise RuntimeError("unknown host")
+import subprocess, socket
 
 def main():
     with open("hosts", "r") as f:
@@ -23,10 +14,11 @@ def main():
             (ip, host) = l.split('\t')
 
             try:
-                ip = getIP(host)
+                ip = socket.gethostbyname(host)
                 print ("%s\t%s" %(ip, host))
-            except RuntimeError as e:
+            except Exception as e:
                 pass
 
 if __name__ == "__main__":
+    socket.setdefaulttimeout(5)
     main()
